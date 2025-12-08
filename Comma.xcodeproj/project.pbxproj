@@ -146,6 +146,11 @@
 			path = DeviceMonitor;
 			sourceTree = "<group>";
 		};
+		FDF1F9C02EE76000001A0000 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				FDD160AE2EE75852008ABC9A /* Comma */,
+				FDF1F9C02EE76000001A0000 /* Shared */,
 				FDD160BC2EE75853008ABC9A /* CommaTests */,
 				FDD160C62EE75853008ABC9A /* CommaUITests */,
 				FDF1F9862EE75B0500131A75 /* ShieldConfiguration */,
