@@ -262,6 +262,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FDD160AE2EE75852008ABC9A /* Comma */,
+				FDF1F9C02EE76000001A0000 /* Shared */,
 			);
 			name = Comma;
 			packageProductDependencies = (
@@ -330,6 +331,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FDF1F9862EE75B0500131A75 /* ShieldConfiguration */,
+				FDF1F9C02EE76000001A0000 /* Shared */,
 			);
 			name = ShieldConfiguration;
 			packageProductDependencies = (
@@ -352,6 +354,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FDF1F9992EE75B3300131A75 /* ShieldAction */,
+				FDF1F9C02EE76000001A0000 /* Shared */,
 			);
 			name = ShieldAction;
 			packageProductDependencies = (
@@ -374,6 +377,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				FDF1F9AC2EE75B4E00131A75 /* DeviceMonitor */,
+				FDF1F9C02EE76000001A0000 /* Shared */,
 			);
 			name = DeviceMonitor;
 			packageProductDependencies = (
