@@ -60,20 +60,14 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             color: .white
         )
         let subtitle = ShieldConfiguration.Label(
-            text: "Take a moment before continuing",
+            text: "Open the Comma app to continue",
             color: UIColor(white: 0.7, alpha: 1.0)
         )
 
-        // Primary button - guides user to open Comma
+        // Primary button - dismiss shield so user can switch to Comma
         let primaryButton = ShieldConfiguration.Label(
-            text: "Open Comma to Breathe",
+            text: "OK",
             color: .white
-        )
-
-        // Secondary button - mindful close
-        let secondaryButton = ShieldConfiguration.Label(
-            text: "I don't need to scroll",
-            color: UIColor(white: 0.6, alpha: 1.0)
         )
 
         return ShieldConfiguration(
@@ -84,7 +78,7 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             subtitle: subtitle,
             primaryButtonLabel: primaryButton,
             primaryButtonBackgroundColor: UIColor(red: 0.4, green: 0.5, blue: 0.9, alpha: 1.0),
-            secondaryButtonLabel: secondaryButton
+            secondaryButtonLabel: nil
         )
     }
 }

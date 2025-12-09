@@ -6,6 +6,7 @@
 //
 
 import ManagedSettings
+import UIKit
 
 // Override the functions below to customize the shield actions used in various situations.
 // The system provides a default response for any functions that your subclass doesn't override.
@@ -50,20 +51,40 @@ class ShieldActionExtension: ShieldActionDelegate {
     ) {
         switch action {
         case .primaryButtonPressed:
-            // User wants to breathe - log attempted entry
+            // Log the event
             logEvent(.attemptedEntry)
-            // Return .none to let the system handle it
-            // User will need to manually open Comma app
-            completionHandler(.none)
+
+            // Try to open Comma app directly
+            openCommaApp()
+
+            // Close the blocked app
+            completionHandler(.close)
 
         case .secondaryButtonPressed:
-            // User chose not to open the app - mindful close
-            logEvent(.mindfulClose)
+            // Secondary button removed, but handle gracefully if called
             completionHandler(.close)
 
         @unknown default:
             completionHandler(.close)
         }
+    }
+
+    // MARK: - Open Comma App
+
+    private func openCommaApp() {
+        guard let url = URL(string: "comma://breathe") else { return }
+
+        // Use Objective-C runtime to access UIApplication.shared
+        // This works around the extension limitation where UIApplication.shared is unavailable
+        let sharedSelector = NSSelectorFromString("sharedApplication")
+        guard let appClass = NSClassFromString("UIApplication") as? NSObject.Type,
+              let sharedApp = appClass.perform(sharedSelector)?.takeUnretainedValue() as? NSObject else {
+            return
+        }
+
+        // Call openURL: method
+        let openSelector = NSSelectorFromString("openURL:")
+        sharedApp.perform(openSelector, with: url)
     }
 
     // MARK: - Event Logging
