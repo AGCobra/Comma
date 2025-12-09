@@ -8,17 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(AuthorizationManager.self) private var authManager
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if appState.shouldShowBreathingRoom {
+                BreathingRoomView()
+            } else if !appState.hasCompletedOnboarding {
+                OnboardingContainerView()
+            } else {
+                DashboardView()
+            }
         }
-        .padding()
+        .animation(.easeInOut(duration: 0.3), value: appState.shouldShowBreathingRoom)
+        .animation(.easeInOut(duration: 0.3), value: appState.hasCompletedOnboarding)
     }
 }
 
 #Preview {
     ContentView()
+        .environment(AppState())
+        .environment(AuthorizationManager())
 }
