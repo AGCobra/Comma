@@ -6,7 +6,7 @@
 //
 
 import ManagedSettings
-import UIKit
+import UserNotifications
 
 // Override the functions below to customize the shield actions used in various situations.
 // The system provides a default response for any functions that your subclass doesn't override.
@@ -54,8 +54,8 @@ class ShieldActionExtension: ShieldActionDelegate {
             // Log the event
             logEvent(.attemptedEntry)
 
-            // Try to open Comma app directly
-            openCommaApp()
+            // Schedule a notification to open Comma app
+            scheduleBreathingNotification()
 
             // Close the blocked app
             completionHandler(.close)
@@ -69,22 +69,28 @@ class ShieldActionExtension: ShieldActionDelegate {
         }
     }
 
-    // MARK: - Open Comma App
+    // MARK: - Notification Scheduling
 
-    private func openCommaApp() {
-        guard let url = URL(string: "comma://breathe") else { return }
+    private func scheduleBreathingNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Time to breathe"
+        content.body = "Tap to start your breathing exercise"
+        content.sound = .default
+        content.userInfo = ["action": "breathe"]
 
-        // Use Objective-C runtime to access UIApplication.shared
-        // This works around the extension limitation where UIApplication.shared is unavailable
-        let sharedSelector = NSSelectorFromString("sharedApplication")
-        guard let appClass = NSClassFromString("UIApplication") as? NSObject.Type,
-              let sharedApp = appClass.perform(sharedSelector)?.takeUnretainedValue() as? NSObject else {
-            return
+        // Trigger immediately (1 second delay required by iOS)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "comma-breathe-\(UUID().uuidString)",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("ShieldAction: Failed to schedule notification - \(error)")
+            }
         }
-
-        // Call openURL: method
-        let openSelector = NSSelectorFromString("openURL:")
-        sharedApp.perform(openSelector, with: url)
     }
 
     // MARK: - Event Logging

@@ -2,11 +2,13 @@
 //  PermissionsView.swift
 //  Comma
 //
-//  Third onboarding screen - requests FamilyControls authorization.
+//  Third onboarding screen - requests FamilyControls and notification authorization.
 //
 
 import SwiftUI
 import FamilyControls
+import UserNotifications
+import UIKit
 
 struct PermissionsView: View {
     @Environment(AuthorizationManager.self) private var authManager
@@ -14,6 +16,7 @@ struct PermissionsView: View {
 
     @State private var isRequesting = false
     @State private var showDeniedAlert = false
+    @State private var deniedAlertMessage = ""
 
     var body: some View {
         VStack(spacing: 32) {
@@ -24,10 +27,10 @@ struct PermissionsView: View {
                 .foregroundStyle(Color.accentColor)
 
             VStack(spacing: 16) {
-                Text("Permission Required")
+                Text("Permissions Required")
                     .font(.largeTitle.bold())
 
-                Text("Comma needs Screen Time access to create mindful pauses before opening selected apps.")
+                Text("Comma needs Screen Time access to create mindful pauses, and notifications to guide you through breathing exercises.")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -40,13 +43,13 @@ struct PermissionsView: View {
 
             Spacer()
 
-            Button(action: requestPermission) {
+            Button(action: requestPermissions) {
                 HStack {
                     if isRequesting {
                         ProgressView()
                             .tint(.white)
                     }
-                    Text("Allow Screen Time Access")
+                    Text("Allow Permissions")
                 }
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -60,25 +63,51 @@ struct PermissionsView: View {
             .padding(.bottom, 48)
         }
         .alert("Permission Denied", isPresented: $showDeniedAlert) {
-            Button("Try Again", action: requestPermission)
+            Button("Try Again", action: requestPermissions)
+            Button("Open Settings") {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsURL)
+                }
+            }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Screen Time access is required for Comma to work. Please allow access to continue.")
+            Text(deniedAlertMessage)
         }
     }
 
-    private func requestPermission() {
+    private func requestPermissions() {
         isRequesting = true
 
         Task {
+            // Request Screen Time authorization
             await authManager.requestAuthorization()
+
+            // Request notification authorization
+            let notificationCenter = UNUserNotificationCenter.current()
+            let notificationsGranted = (try? await notificationCenter.requestAuthorization(options: [.alert, .sound])) ?? false
+
+            // Check current notification settings (in case already granted)
+            let notificationSettings = await notificationCenter.notificationSettings()
+            let notificationsEnabled = notificationSettings.authorizationStatus == .authorized
 
             await MainActor.run {
                 isRequesting = false
 
-                if authManager.isAuthorized {
+                let screenTimeGranted = authManager.isAuthorized
+                let notificationsOk = notificationsGranted || notificationsEnabled
+
+                if screenTimeGranted && notificationsOk {
                     onContinue()
                 } else {
+                    // Build specific error message
+                    var missingPermissions: [String] = []
+                    if !screenTimeGranted {
+                        missingPermissions.append("Screen Time")
+                    }
+                    if !notificationsOk {
+                        missingPermissions.append("Notifications")
+                    }
+                    deniedAlertMessage = "\(missingPermissions.joined(separator: " and ")) access is required for Comma to work. Please allow access to continue."
                     showDeniedAlert = true
                 }
             }

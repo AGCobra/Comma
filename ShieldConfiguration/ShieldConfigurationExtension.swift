@@ -60,13 +60,13 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             color: .white
         )
         let subtitle = ShieldConfiguration.Label(
-            text: "Open the Comma app to continue",
+            text: "A notification will guide you to breathe",
             color: UIColor(white: 0.7, alpha: 1.0)
         )
 
         // Primary button - dismiss shield so user can switch to Comma
         let primaryButton = ShieldConfiguration.Label(
-            text: "OK",
+            text: "Take a breath",
             color: .white
         )
 
