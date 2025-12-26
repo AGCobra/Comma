@@ -76,8 +76,9 @@ final class ShieldManager {
         // Remove shields immediately
         removeShields()
 
-        // Set unlock expiration in shared storage
-        AppGroupManager.shared.setUnlocked(for: SharedConstants.unlockDurationSeconds)
+        // Set unlock expiration in shared storage (using user-configured duration)
+        let unlockDuration = AppGroupManager.shared.unlockDurationSeconds
+        AppGroupManager.shared.setUnlocked(for: unlockDuration)
 
         // Schedule re-shielding via DeviceActivityMonitor
         scheduleReshield()
@@ -91,7 +92,8 @@ final class ShieldManager {
         activityCenter.stopMonitoring([activityName])
 
         // Calculate the end time (now + unlock duration)
-        let endDate = Date().addingTimeInterval(SharedConstants.unlockDurationSeconds)
+        let unlockDuration = AppGroupManager.shared.unlockDurationSeconds
+        let endDate = Date().addingTimeInterval(unlockDuration)
         let endComponents = Calendar.current.dateComponents(
             [.hour, .minute, .second],
             from: endDate
@@ -117,7 +119,7 @@ final class ShieldManager {
             print("Failed to schedule re-shielding: \(error)")
             // As a fallback, immediately re-apply shields after delay
             Task {
-                try? await Task.sleep(for: .seconds(SharedConstants.unlockDurationSeconds))
+                try? await Task.sleep(for: .seconds(unlockDuration))
                 await MainActor.run {
                     applyShields()
                 }

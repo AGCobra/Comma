@@ -16,12 +16,16 @@ struct BreathingRoomView: View {
     @State private var timerTask: Task<Void, Never>?
     @State private var instructionText = "Breathe in..."
 
-    private let totalDuration = SharedConstants.breathingDurationSeconds
+    // Get user-configured breathing duration
+    private var totalDuration: Double {
+        Double(AppGroupManager.shared.breathingDurationSeconds)
+    }
 
-    // Breathing cycle: 4s inhale, 2s hold, 4s exhale (10s total)
-    private let inhaleDuration: Double = 4.0
-    private let holdDuration: Double = 2.0
-    private let exhaleDuration: Double = 4.0
+    // Breathing cycle phases scale proportionally to total duration
+    // Base ratio: 4s inhale, 2s hold, 4s exhale (40%, 20%, 40%)
+    private var inhaleDuration: Double { totalDuration * 0.4 }
+    private var holdDuration: Double { totalDuration * 0.2 }
+    private var exhaleDuration: Double { totalDuration * 0.4 }
 
     var body: some View {
         ZStack {

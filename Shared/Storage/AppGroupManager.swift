@@ -65,4 +65,33 @@ final class AppGroupManager: @unchecked Sendable {
             userDefaults.set(newValue, forKey: SharedConstants.UserDefaultsKeys.hasCompletedOnboarding)
         }
     }
+
+    // MARK: - Duration Settings
+
+    /// Unlock duration in minutes (how long apps stay unlocked after breathing)
+    var unlockDurationMinutes: Int {
+        get {
+            let value = userDefaults.integer(forKey: SharedConstants.UserDefaultsKeys.unlockDurationMinutes)
+            return value > 0 ? value : SharedConstants.defaultUnlockDurationMinutes
+        }
+        set {
+            userDefaults.set(newValue, forKey: SharedConstants.UserDefaultsKeys.unlockDurationMinutes)
+        }
+    }
+
+    /// Unlock duration in seconds (convenience property)
+    var unlockDurationSeconds: TimeInterval {
+        TimeInterval(unlockDurationMinutes * 60)
+    }
+
+    /// Breathing exercise duration in seconds
+    var breathingDurationSeconds: Int {
+        get {
+            let value = userDefaults.integer(forKey: SharedConstants.UserDefaultsKeys.breathingDurationSeconds)
+            return value > 0 ? value : SharedConstants.defaultBreathingDurationSeconds
+        }
+        set {
+            userDefaults.set(newValue, forKey: SharedConstants.UserDefaultsKeys.breathingDurationSeconds)
+        }
+    }
 }

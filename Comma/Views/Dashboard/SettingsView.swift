@@ -12,9 +12,13 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isPickerPresented = false
     @State private var selection: FamilyActivitySelection
+    @State private var unlockDuration: Int
+    @State private var breathingDuration: Int
 
     init() {
         _selection = State(initialValue: ShieldManager.shared.selectedApps)
+        _unlockDuration = State(initialValue: AppGroupManager.shared.unlockDurationMinutes)
+        _breathingDuration = State(initialValue: AppGroupManager.shared.breathingDurationSeconds)
     }
 
     var body: some View {
@@ -40,21 +44,31 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    HStack {
+                    Picker(selection: $unlockDuration) {
+                        ForEach(SharedConstants.unlockDurationOptions, id: \.self) { minutes in
+                            Text("\(minutes) minutes").tag(minutes)
+                        }
+                    } label: {
                         Label("Unlock Duration", systemImage: "timer")
-                        Spacer()
-                        Text("15 minutes")
-                            .foregroundStyle(.secondary)
+                    }
+                    .onChange(of: unlockDuration) { _, newValue in
+                        AppGroupManager.shared.unlockDurationMinutes = newValue
                     }
 
-                    HStack {
+                    Picker(selection: $breathingDuration) {
+                        ForEach(SharedConstants.breathingDurationOptions, id: \.self) { seconds in
+                            Text("\(seconds) seconds").tag(seconds)
+                        }
+                    } label: {
                         Label("Breath Duration", systemImage: "lungs.fill")
-                        Spacer()
-                        Text("10 seconds")
-                            .foregroundStyle(.secondary)
+                    }
+                    .onChange(of: breathingDuration) { _, newValue in
+                        AppGroupManager.shared.breathingDurationSeconds = newValue
                     }
                 } header: {
                     Text("Timing")
+                } footer: {
+                    Text("Unlock duration is how long apps stay accessible after breathing. Breath duration is the length of the breathing exercise.")
                 }
 
                 Section {
